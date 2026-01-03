@@ -3,6 +3,7 @@ services:
     name: sudimartin-be
     runtime: node
     plan: free
+    rootDir: be
     buildCommand: npm install
     startCommand: npm start
     envVars:
