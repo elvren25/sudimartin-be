@@ -5,6 +5,7 @@ import { useWorkspace } from "../context/WorkspaceContext";
 import AddMemberForm from "../components/AddMemberForm";
 import ProFamilyTreeVisualization from "../components/ProFamilyTreeVisualization";
 import { ChevronLeft, Plus } from "lucide-react";
+import { getApiUrl, getFetchOptions } from "../config/api";
 
 const FamilyDashboard = () => {
   const navigate = useNavigate();
@@ -34,14 +35,9 @@ const FamilyDashboard = () => {
       setError("");
 
       // Fetch family details
-      const familyRes = await fetch(
-        `http://localhost:5200/api/families/${familyId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const familyRes = await fetch(getApiUrl(`/families/${familyId}`), {
+        ...getFetchOptions(token),
+      });
 
       if (!familyRes.ok) {
         throw new Error("Failed to fetch family");
@@ -53,11 +49,9 @@ const FamilyDashboard = () => {
 
       // Fetch family members
       const membersRes = await fetch(
-        `http://localhost:5200/api/families/${familyId}/members`,
+        getApiUrl(`/families/${familyId}/members`),
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          ...getFetchOptions(token),
         }
       );
 
@@ -93,12 +87,10 @@ const FamilyDashboard = () => {
     if (!deleteConfirm) return;
     try {
       const res = await fetch(
-        `http://localhost:5200/api/families/${familyId}/members/${deleteConfirm}`,
+        getApiUrl(`/families/${familyId}/members/${deleteConfirm}`),
         {
           method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          ...getFetchOptions(token),
         }
       );
 

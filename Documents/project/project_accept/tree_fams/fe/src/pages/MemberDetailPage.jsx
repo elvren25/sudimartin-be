@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ChevronLeft, Edit2, Trash2, Heart, Plus } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import AddMemberForm from "../components/AddMemberForm";
+import { getApiUrl, getFetchOptions } from "../config/api";
 
 export default function MemberDetailPage() {
   const { id } = useParams();
@@ -27,8 +28,8 @@ export default function MemberDetailPage() {
       setError("");
 
       // Get member from any family (search all families)
-      const familiesRes = await fetch("http://localhost:5200/api/families", {
-        headers: { Authorization: `Bearer ${token}` },
+      const familiesRes = await fetch(getApiUrl("/families"), {
+        ...getFetchOptions(token),
       });
 
       if (!familiesRes.ok) throw new Error("Gagal mengambil data keluarga");
@@ -39,9 +40,9 @@ export default function MemberDetailPage() {
       // Search member in all families
       for (const family of families) {
         const membersRes = await fetch(
-          `http://localhost:5200/api/families/${family.id}/members`,
+          getApiUrl(`/families/${family.id}/members`),
           {
-            headers: { Authorization: `Bearer ${token}` },
+            ...getFetchOptions(token),
           }
         );
 
@@ -171,10 +172,10 @@ export default function MemberDetailPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:5200/api/families/${familyId}/members/${member.id}`,
+        getApiUrl(`/families/${familyId}/members/${member.id}`),
         {
           method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
+          ...getFetchOptions(token),
         }
       );
 

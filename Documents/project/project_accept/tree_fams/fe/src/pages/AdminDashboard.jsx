@@ -3,6 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { Plus, Trash2, Eye, LogOut } from "lucide-react";
 import CreateFamilyForm from "../components/CreateFamilyForm";
+import { getApiUrl, getFetchOptions } from "../config/api";
 
 const AdminDashboard = () => {
   const { user, token, logout } = useAuth();
@@ -30,10 +31,8 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
       setError("");
-      const response = await fetch("http://localhost:5200/api/families", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await fetch(getApiUrl("/families"), {
+        ...getFetchOptions(token),
       });
 
       const data = await response.json();
@@ -61,15 +60,10 @@ const AdminDashboard = () => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5200/api/families/${familyId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(getApiUrl(`/families/${familyId}`), {
+        method: "DELETE",
+        ...getFetchOptions(token),
+      });
 
       if (!response.ok) {
         const data = await response.json();

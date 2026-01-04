@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Eye, Home } from "lucide-react";
+import { getApiUrl, getFetchOptions } from "../config/api";
 
 const UserHomePage = () => {
   const { token } = useAuth();
@@ -23,10 +24,8 @@ const UserHomePage = () => {
       setLoading(true);
       setError("");
 
-      const response = await fetch("http://localhost:5200/api/families", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const response = await fetch(getApiUrl("/families"), {
+        ...getFetchOptions(token),
       });
 
       const data = await response.json();
