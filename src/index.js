@@ -93,13 +93,13 @@ app.listen(PORT, async () => {
   // Test database connection
   const pool = require("./config/database");
 
-  // Initialize database schema on startup
-  try {
-    const initializeSchema = require("./database/initializeSchema");
-    await initializeSchema();
-  } catch (error) {
-    console.error("⚠️ Schema initialization warning:", error.message);
-  }
+  // Initialize database schema on startup (disabled - create tables manually in Railway UI)
+  console.log(
+    "📌 Note: Database tables must be created manually via Railway Database UI"
+  );
+  console.log(
+    "   Use railway-init.sql as template for CREATE TABLE statements"
+  );
 
   pool
     .getConnection()
