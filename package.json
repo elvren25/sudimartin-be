@@ -4,7 +4,7 @@
   "description": "Backend untuk aplikasi Family Tree",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "node src/database/initialize.js && node src/index.js",
     "dev": "nodemon src/index.js",
     "migrate": "node src/database/initialize.js"
   },
