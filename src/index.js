@@ -20,7 +20,7 @@ const corsOptions = {
       "http://127.0.0.1:3000",
       "http://127.0.0.1:5173",
     ];
-    
+
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
@@ -33,6 +33,8 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 200,
 };
+
+// Apply CORS middleware
 
 // Middleware
 app.use(cors(corsOptions));
