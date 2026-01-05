@@ -10,25 +10,10 @@ const familyRoutes = require("./routes/familyRoutes");
 const app = express();
 const PORT = process.env.PORT || 5200;
 
-// CORS Configuration - Allow specific origins
+// CORS Configuration
 const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      "https://sudimartin-fe.vercel.app",
-      "http://localhost:3000",
-      "http://localhost:5173",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:5173",
-    ];
-
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
+  origin: "*",
+  credentials: false,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   optionsSuccessStatus: 200,
