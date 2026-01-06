@@ -697,4 +697,47 @@ router.post("/:id/verify-access", async (req, res) => {
   }
 });
 
+/**
+ * POST /api/families/verify-by-name/:namaKeluarga - Verify access code by family name
+ * Body: { access_code }
+ */
+router.post("/verify-by-name/:namaKeluarga", async (req, res) => {
+  try {
+    const { access_code } = req.body;
+    const namaKeluarga = decodeURIComponent(req.params.namaKeluarga);
+
+    if (!access_code) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({
+        success: false,
+        message: "Kode akses harus diisi",
+      });
+    }
+
+    const family = await Family.verifyAccessCodeByName(
+      namaKeluarga,
+      access_code
+    );
+
+    if (!family) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        success: false,
+        message: "Kode akses salah atau keluarga tidak ditemukan",
+      });
+    }
+
+    res.status(HTTP_STATUS.OK).json({
+      success: true,
+      message: "Kode akses valid",
+      data: family,
+    });
+  } catch (error) {
+    console.error("Error verifying access code by name:", error);
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Gagal memverifikasi kode akses",
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;

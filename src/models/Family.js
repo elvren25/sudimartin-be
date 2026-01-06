@@ -39,6 +39,15 @@ class Family {
   }
 
   /**
+   * Get family by name
+   */
+  static async findByName(namaKeluarga) {
+    const query = "SELECT * FROM families WHERE nama_keluarga = ?";
+    const [rows] = await pool.execute(query, [namaKeluarga]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
    * Get all families by admin ID
    */
   static async findByAdminId(adminId) {
@@ -144,6 +153,16 @@ class Family {
   static async verifyAccessCode(familyId, accessCode) {
     const query = "SELECT * FROM families WHERE id = ? AND access_code = ?";
     const [rows] = await pool.execute(query, [familyId, accessCode]);
+    return rows.length > 0 ? rows[0] : null;
+  }
+
+  /**
+   * Verify access code for a family by name
+   */
+  static async verifyAccessCodeByName(namaKeluarga, accessCode) {
+    const query =
+      "SELECT * FROM families WHERE nama_keluarga = ? AND access_code = ?";
+    const [rows] = await pool.execute(query, [namaKeluarga, accessCode]);
     return rows.length > 0 ? rows[0] : null;
   }
 }
