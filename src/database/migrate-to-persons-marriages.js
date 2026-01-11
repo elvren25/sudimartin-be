@@ -60,18 +60,19 @@ async function migrateData() {
     for (const member of members) {
       const [result] = await connection.execute(
         `INSERT INTO persons (
-          family_id, user_id, nama_depan, nama_belakang, nama_sapaan, gender,
+          family_id, user_id, nama_depan, nama_belakang, nama_panggilan, nama_sapaan, gender,
           tanggal_lahir, tempat_lahir, tanggal_meninggal, status_hidup,
           pekerjaan, biography, 
           contact_phone, contact_email, contact_address,
           nama_display, photo_url, node_position_x, node_position_y,
           created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           member.family_id,
           member.user_id,
           member.nama_depan,
           member.nama_belakang,
+          member.nama_panggilan || null,
           member.nama_sapaan,
           member.gender,
           member.tanggal_lahir,

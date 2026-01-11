@@ -41,7 +41,7 @@ class Person {
   static async create(personData) {
     const query = `
       INSERT INTO persons (
-        family_id, user_id, nama_depan, nama_belakang, nama_sapaan, gender,
+        family_id, user_id, nama_depan, nama_belakang, nama_panggilan, gender,
         tanggal_lahir, tempat_lahir, tanggal_meninggal, tempat_meninggal, status_hidup,
         ayah_id, ibu_id, pekerjaan, pendidikan, biography,
         contact_phone, contact_email, contact_address,
@@ -54,7 +54,7 @@ class Person {
       personData.user_id || null,
       personData.nama_depan,
       personData.nama_belakang || null,
-      personData.nama_sapaan || null,
+      personData.nama_panggilan || null,
       personData.gender || "Pria",
       personData.tanggal_lahir || null,
       personData.tempat_lahir || null,
@@ -212,7 +212,7 @@ class Person {
     const allowedFields = [
       "nama_depan",
       "nama_belakang",
-      "nama_sapaan",
+      "nama_panggilan",
       "gender",
       "tanggal_lahir",
       "tempat_lahir",

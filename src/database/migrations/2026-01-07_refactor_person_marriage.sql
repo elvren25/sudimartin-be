@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS persons (
   -- Personal Information
   nama_depan VARCHAR(100) NOT NULL,
   nama_belakang VARCHAR(100),
+  nama_panggilan VARCHAR(100),
   nama_sapaan VARCHAR(100),
   nama_lengkap VARCHAR(255) GENERATED ALWAYS AS (
     CONCAT(IFNULL(nama_depan, ''), ' ', IFNULL(nama_belakang, ''))
