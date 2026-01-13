@@ -55,19 +55,6 @@ app.post("/api/setup/make-admin/:email", async (req, res) => {
     const pool = require("./config/database");
     const email = decodeURIComponent(req.params.email);
 
-    // Check if admin already exists
-    const [admins] = await pool.execute(
-      "SELECT COUNT(*) as count FROM users WHERE role = 'admin'"
-    );
-
-    if (admins[0].count > 0) {
-      return res.status(403).json({
-        success: false,
-        message:
-          "Admin already exists. This endpoint only works on first setup.",
-      });
-    }
-
     // Update user to admin
     const [result] = await pool.execute(
       "UPDATE users SET role = 'admin', isRoot = TRUE WHERE email = ?",
