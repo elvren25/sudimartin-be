@@ -55,7 +55,8 @@ router.post("/:id/persons", verifyToken, async (req, res) => {
       data: person,
     });
   } catch (error) {
-    console.error("Error adding person:", error);
+    console.error("Error adding person:", error.message);
+    console.error("Stack trace:", error.stack);
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Failed to add person",
