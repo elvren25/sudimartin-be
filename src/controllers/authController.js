@@ -1,5 +1,4 @@
 const bcrypt = require("bcryptjs");
-const { v4: uuidv4 } = require("uuid");
 const User = require("../models/User");
 const { HTTP_STATUS } = require("../config/constants");
 const { generateToken } = require("../middleware/authMiddleware");
@@ -31,7 +30,6 @@ exports.register = async (req, res) => {
 
     // Create user
     const newUser = {
-      id: uuidv4(),
       namaDepan,
       namaBelakang,
       email,
@@ -40,19 +38,19 @@ exports.register = async (req, res) => {
       role: "user", // Default role
     };
 
-    await User.create(newUser);
+    const createdUser = await User.create(newUser);
 
     // Generate token
-    const token = generateToken(newUser);
+    const token = generateToken(createdUser);
 
     res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: "Registrasi berhasil",
       data: {
-        id: newUser.id,
-        email: newUser.email,
-        namaDepan: newUser.namaDepan,
-        role: newUser.role,
+        id: createdUser.id,
+        email: createdUser.email,
+        namaDepan: createdUser.namaDepan,
+        role: createdUser.role,
       },
       token,
     });
