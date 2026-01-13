@@ -40,13 +40,13 @@ class Person {
    */
   static async create(personData) {
     const query = `
-      INSERT INTO persons (
-        family_id, user_id, nama_depan, nama_belakang, nama_panggilan, gender,
-        tanggal_lahir, tempat_lahir, tanggal_meninggal, tempat_meninggal, status_hidup,
-        ayah_id, ibu_id, pekerjaan, pendidikan, biography,
+      INSERT INTO family_members (
+        family_id, user_id, nama_depan, nama_belakang, nama_sapaan, gender,
+        tanggal_lahir, tempat_lahir, tanggal_meninggal, status,
+        ayah_id, ibu_id, pekerjaan, biography,
         contact_phone, contact_email, contact_address,
         nama_display, photo_url, node_position_x, node_position_y
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     const values = [
@@ -59,12 +59,10 @@ class Person {
       personData.tanggal_lahir || null,
       personData.tempat_lahir || null,
       personData.tanggal_meninggal || null,
-      personData.tempat_meninggal || null,
       personData.status_hidup || "Hidup",
       personData.ayah_id || null,
       personData.ibu_id || null,
       personData.pekerjaan || null,
-      personData.pendidikan || null,
       personData.biography || null,
       personData.contact_phone || null,
       personData.contact_email || null,
@@ -79,7 +77,7 @@ class Person {
     const newPerson = {
       id: result.insertId,
       ...personData,
-      status_hidup: personData.status_hidup || "Hidup",
+      status: personData.status_hidup || "Hidup",
       created_at: new Date(),
     };
 
@@ -94,7 +92,7 @@ class Person {
    * Get person by ID
    */
   static async findById(personId) {
-    const query = "SELECT * FROM persons WHERE id = ?";
+    const query = "SELECT * FROM family_members WHERE id = ?";
     const [rows] = await pool.execute(query, [personId]);
     if (rows.length === 0) return null;
 
@@ -111,7 +109,7 @@ class Person {
    */
   static async findByFamilyId(familyId) {
     const query = `
-      SELECT * FROM persons 
+      SELECT * FROM family_members 
       WHERE family_id = ? 
       ORDER BY created_at ASC
     `;
@@ -129,7 +127,7 @@ class Person {
    */
   static async findByGeneration(familyId, generation) {
     const query = `
-      SELECT * FROM persons 
+      SELECT * FROM family_members 
       WHERE family_id = ? AND generation = ?
       ORDER BY created_at ASC
     `;
@@ -142,7 +140,7 @@ class Person {
    */
   static async findByUserIdAndFamilyId(userId, familyId) {
     const query = `
-      SELECT * FROM persons 
+      SELECT * FROM family_members 
       WHERE family_id = ? AND user_id = ?
       LIMIT 1
     `;
@@ -155,7 +153,7 @@ class Person {
    */
   static async getChildren(personId) {
     const query = `
-      SELECT * FROM persons 
+      SELECT * FROM family_members 
       WHERE ayah_id = ? OR ibu_id = ?
       ORDER BY tanggal_lahir ASC
     `;
@@ -184,7 +182,7 @@ class Person {
     if (!person) return [];
 
     let query = `
-      SELECT * FROM persons 
+      SELECT * FROM family_members 
       WHERE id != ? 
       AND (
         (ayah_id = ? AND ayah_id IS NOT NULL) 
@@ -243,7 +241,7 @@ class Person {
     if (fields.length === 0) return false;
 
     values.push(personId);
-    const query = `UPDATE persons SET ${fields.join(
+    const query = `UPDATE family_members SET ${fields.join(
       ", "
     )}, updated_at = NOW() WHERE id = ?`;
     const [result] = await pool.execute(query, values);
@@ -254,7 +252,7 @@ class Person {
    * Delete person
    */
   static async delete(personId) {
-    const query = "DELETE FROM persons WHERE id = ?";
+    const query = "DELETE FROM family_members WHERE id = ?";
     const [result] = await pool.execute(query, [personId]);
     return result.affectedRows > 0;
   }
@@ -264,7 +262,7 @@ class Person {
    */
   static async searchByName(familyId, searchTerm) {
     const query = `
-      SELECT * FROM persons 
+      SELECT * FROM family_members 
       WHERE family_id = ? 
       AND (
         nama_depan LIKE ? 

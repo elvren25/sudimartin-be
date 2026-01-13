@@ -124,7 +124,7 @@ class Marriage {
     if (!marriage) return [];
 
     const query = `
-      SELECT * FROM persons 
+      SELECT * FROM family_members 
       WHERE (ayah_id = ? OR ayah_id IS NULL)
       AND (ibu_id = ? OR ibu_id IS NULL)
       AND ayah_id IS NOT NULL AND ibu_id IS NOT NULL
