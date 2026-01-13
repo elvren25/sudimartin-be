@@ -189,7 +189,15 @@ app.post("/api/init-db", async (req, res) => {
       ON DUPLICATE KEY UPDATE password = '$2a$10$Zp3IKNVh8N6c0Z.F6v6mxO0B6.DfPnYkDM5mKvFZE5X4KzJ2O2YdG';
     `;
 
-    await connection.query(setupSQL);
+    // Execute all SQL statements
+    const statements = setupSQL.split(";").filter((s) => s.trim());
+    for (const statement of statements) {
+      if (statement.trim()) {
+        await connection.query(statement);
+        console.log("✅ Executed:", statement.substring(0, 50) + "...");
+      }
+    }
+
     await connection.end();
 
     console.log("✅ Database initialization completed!");
