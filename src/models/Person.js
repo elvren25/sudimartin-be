@@ -108,6 +108,18 @@ class Person {
     `;
     const [rows] = await pool.execute(query, [familyId]);
 
+    // Debug logging
+    console.log("[Person.findByFamilyId] SQL Query:", query);
+    console.log("[Person.findByFamilyId] familyId:", familyId);
+    console.log("[Person.findByFamilyId] Returned rows count:", rows.length);
+    if (rows.length > 0) {
+      console.log(
+        "[Person.findByFamilyId] First row keys:",
+        Object.keys(rows[0])
+      );
+      console.log("[Person.findByFamilyId] First row data:", rows[0]);
+    }
+
     // Add computed fields to each person
     return rows.map((person) => ({
       ...person,
