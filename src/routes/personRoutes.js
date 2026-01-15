@@ -123,6 +123,15 @@ router.get("/:id/persons", verifyToken, async (req, res) => {
       "[GET /families/:id/persons] Total persons found:",
       persons.length
     );
+
+    // Debug: Log each person's gender value
+    console.log("[GET /families/:id/persons] Raw persons data:");
+    persons.forEach((p) => {
+      console.log(
+        `  - ${p.nama_depan}: gender="${p.gender}" (type: ${typeof p.gender})`
+      );
+    });
+
     console.log("[GET /families/:id/persons] Persons data:", persons);
 
     res.status(HTTP_STATUS.OK).json({
