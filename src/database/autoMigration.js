@@ -9,6 +9,27 @@ async function checkAndMigrate() {
   console.log("🔍 Checking database schema...");
 
   try {
+    // Check if nama_panggilan column exists in family_members
+    const [namaPanel] = await pool.execute(
+      "SHOW COLUMNS FROM family_members LIKE 'nama_panggilan'"
+    );
+
+    if (namaPanel.length === 0) {
+      console.log(
+        "⚠️  Column 'nama_panggilan' not found. Running migration..."
+      );
+
+      // Add nama_panggilan column
+      await pool.execute(`
+        ALTER TABLE family_members 
+        ADD COLUMN nama_panggilan VARCHAR(100) NOT NULL DEFAULT 'Panggilan'
+        AFTER nama_depan
+      `);
+      console.log("✅ Added column 'nama_panggilan'");
+    } else {
+      console.log("✅ Column 'nama_panggilan' exists");
+    }
+
     // Check if access_code column exists
     const [columns] = await pool.execute(
       "SHOW COLUMNS FROM families LIKE 'access_code'"
