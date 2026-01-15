@@ -66,18 +66,19 @@ class Person {
     ];
 
     const [result] = await pool.execute(query, values);
-    const newPerson = {
-      id: result.insertId,
-      ...personData,
-      status: personData.status || "Hidup",
-      created_at: new Date(),
-    };
+
+    // Fetch the newly created person from database
+    const newPersonId = result.insertId;
+    const freshPerson = await this.findById(newPersonId);
+
+    if (!freshPerson) {
+      throw new Error("Failed to retrieve newly created person");
+    }
 
     // Calculate generation dynamically
-    newPerson.generation = await this.calculateGeneration(newPerson.id);
-    newPerson.isRoot = this.isRoot(newPerson);
+    freshPerson.generation = await this.calculateGeneration(newPersonId);
 
-    return newPerson;
+    return freshPerson;
   }
 
   /**
