@@ -9,34 +9,59 @@ async function checkAndMigrate() {
   console.log("🔍 Checking database schema...");
 
   try {
-    // Check if nama_panggilan column exists in family_members
-    const [namaPanel] = await pool.execute(
-      "SHOW COLUMNS FROM family_members LIKE 'nama_panggilan'"
+    // First, check what columns exist in family_members
+    const [existingColumns] = await pool.execute(
+      "SHOW COLUMNS FROM family_members"
     );
+    const columnNames = existingColumns.map((col) => col.Field);
+    console.log("📋 Existing columns in family_members:", columnNames);
 
-    if (namaPanel.length === 0) {
-      console.log(
-        "⚠️  Column 'nama_panggilan' not found. Running migration..."
-      );
+    // Define all required columns and their definitions
+    const requiredColumns = {
+      nama_panggilan: "VARCHAR(100) NOT NULL DEFAULT 'Panggilan'",
+      nama_belakang: "VARCHAR(100)",
+      tanggal_lahir: "DATE",
+      tempat_lahir: "VARCHAR(100)",
+      tanggal_meninggal: "DATE",
+      ayah_id: "INT",
+      ibu_id: "INT",
+      pekerjaan: "VARCHAR(100)",
+      alamat: "TEXT",
+      biografi: "TEXT",
+      photo_url: "LONGTEXT",
+      status: "VARCHAR(50) DEFAULT 'Hidup'",
+    };
 
-      // Add nama_panggilan column
-      await pool.execute(`
-        ALTER TABLE family_members 
-        ADD COLUMN nama_panggilan VARCHAR(100) NOT NULL DEFAULT 'Panggilan'
-        AFTER nama_depan
-      `);
-      console.log("✅ Added column 'nama_panggilan'");
-    } else {
-      console.log("✅ Column 'nama_panggilan' exists");
+    // Add missing columns
+    for (const [columnName, columnDef] of Object.entries(requiredColumns)) {
+      if (!columnNames.includes(columnName)) {
+        console.log(`⚠️  Column '${columnName}' not found. Adding...`);
+        try {
+          await pool.execute(`
+            ALTER TABLE family_members 
+            ADD COLUMN ${columnName} ${columnDef}
+          `);
+          console.log(`✅ Added column '${columnName}'`);
+        } catch (err) {
+          console.error(
+            `❌ Failed to add column '${columnName}':`,
+            err.message
+          );
+        }
+      } else {
+        console.log(`✅ Column '${columnName}' exists`);
+      }
     }
 
-    // Check if access_code column exists
+    // Check if access_code column exists in families table
     const [columns] = await pool.execute(
       "SHOW COLUMNS FROM families LIKE 'access_code'"
     );
 
     if (columns.length === 0) {
-      console.log("⚠️  Column 'access_code' not found. Running migration...");
+      console.log(
+        "⚠️  Column 'access_code' not found in families. Running migration..."
+      );
 
       // Add access_code column
       await pool.execute(`
@@ -54,7 +79,6 @@ async function checkAndMigrate() {
         `);
         console.log("✅ Added index 'idx_access_code'");
       } catch (err) {
-        // Index might already exist, ignore error
         if (!err.message.includes("Duplicate key name")) {
           console.log("⚠️  Index might already exist:", err.message);
         }
@@ -73,14 +97,15 @@ async function checkAndMigrate() {
         );
       }
 
-      console.log("🎉 Migration completed successfully!");
+      console.log("🎉 All migrations completed successfully!");
     } else {
-      console.log("✅ Database schema is up to date");
+      console.log("✅ Database families schema is up to date");
     }
   } catch (error) {
     console.error("❌ Migration error:", error.message);
-    // Don't crash the server, just log the error
-    console.error("⚠️  Please run migration manually if needed");
+    console.error(
+      "⚠️  Please check database and run migration manually if needed"
+    );
   }
 }
 
