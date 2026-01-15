@@ -128,15 +128,15 @@ class Person {
   }
 
   /**
-   * Get person by user ID and family ID
+   * Get person by ID and family ID
    */
-  static async findByUserIdAndFamilyId(userId, familyId) {
+  static async findByFamilyIdAndName(familyId, nama_depan) {
     const query = `
       SELECT * FROM family_members 
-      WHERE family_id = ? AND user_id = ?
+      WHERE family_id = ? AND nama_depan = ?
       LIMIT 1
     `;
-    const [rows] = await pool.execute(query, [familyId, userId]);
+    const [rows] = await pool.execute(query, [familyId, nama_depan]);
     return rows.length > 0 ? rows[0] : null;
   }
 
@@ -198,7 +198,7 @@ class Person {
     const fields = [];
     const values = [];
 
-    // List of fields that can be updated (generation is computed, not stored)
+    // List of fields that can be updated (matches the schema)
     const allowedFields = [
       "nama_depan",
       "nama_belakang",
@@ -207,20 +207,13 @@ class Person {
       "tanggal_lahir",
       "tempat_lahir",
       "tanggal_meninggal",
-      "tempat_meninggal",
-      "status_hidup",
+      "status",
       "ayah_id",
       "ibu_id",
       "pekerjaan",
-      "pendidikan",
-      "biography",
-      "contact_phone",
-      "contact_email",
-      "contact_address",
-      "nama_display",
+      "alamat",
+      "biografi",
       "photo_url",
-      "node_position_x",
-      "node_position_y",
     ];
 
     for (const [key, value] of Object.entries(personData)) {
