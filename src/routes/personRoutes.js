@@ -118,6 +118,13 @@ router.get("/:id/persons", verifyToken, async (req, res) => {
 
     const persons = await Person.findByFamilyId(req.params.id);
 
+    console.log("[GET /families/:id/persons] Family ID:", req.params.id);
+    console.log(
+      "[GET /families/:id/persons] Total persons found:",
+      persons.length
+    );
+    console.log("[GET /families/:id/persons] Persons data:", persons);
+
     res.status(HTTP_STATUS.OK).json({
       success: true,
       message: "Persons retrieved successfully",
