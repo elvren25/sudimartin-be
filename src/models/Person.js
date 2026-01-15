@@ -227,9 +227,7 @@ class Person {
     if (fields.length === 0) return false;
 
     values.push(personId);
-    const query = `UPDATE family_members SET ${fields.join(
-      ", "
-    )}, updated_at = NOW() WHERE id = ?`;
+    const query = `UPDATE family_members SET ${fields.join(", ")} WHERE id = ?`;
     const [result] = await pool.execute(query, values);
     return result.affectedRows > 0;
   }
