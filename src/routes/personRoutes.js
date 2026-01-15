@@ -51,7 +51,7 @@ router.post("/:id/persons", verifyToken, async (req, res) => {
     console.log("Gender value:", gender, "Type:", typeof gender);
 
     const personData = {
-      family_id: req.params.id,
+      family_id: parseInt(req.params.id), // Convert to integer
       ...req.body,
     };
 
