@@ -70,7 +70,54 @@ class FamilyMember {
       ORDER BY generation ASC, created_at ASC
     `;
     const [rows] = await pool.execute(query, [familyId]);
+
+    // Build person map for generation calculation
+    const personMap = new Map();
+    rows.forEach((person) => {
+      personMap.set(person.id, person);
+    });
+
+    // Calculate generation for each person based on parents
+    for (const [id, person] of personMap.entries()) {
+      // Check if person has parents
+      const fatherGen =
+        person.ayah_id && personMap.has(person.ayah_id)
+          ? await this.calculateGenerationFromMap(person.ayah_id, personMap)
+          : 0;
+      const motherGen =
+        person.ibu_id && personMap.has(person.ibu_id)
+          ? await this.calculateGenerationFromMap(person.ibu_id, personMap)
+          : 0;
+
+      // Generation = max(parent generations) + 1, or 1 if no parents
+      person.generation =
+        fatherGen > 0 || motherGen > 0 ? Math.max(fatherGen, motherGen) + 1 : 1;
+    }
+
     return rows;
+  }
+
+  /**
+   * Helper function to calculate generation from personMap
+   */
+  static async calculateGenerationFromMap(personId, personMap) {
+    const person = personMap.get(personId);
+    if (!person) return 0;
+
+    // If person has no parents, it's generation 1
+    if (!person.ayah_id && !person.ibu_id) return 1;
+
+    // Calculate parent generations
+    const fatherGen =
+      person.ayah_id && personMap.has(person.ayah_id)
+        ? await this.calculateGenerationFromMap(person.ayah_id, personMap)
+        : 0;
+    const motherGen =
+      person.ibu_id && personMap.has(person.ibu_id)
+        ? await this.calculateGenerationFromMap(person.ibu_id, personMap)
+        : 0;
+
+    return Math.max(fatherGen, motherGen) + 1;
   }
 
   /**
