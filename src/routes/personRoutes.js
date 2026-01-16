@@ -373,6 +373,42 @@ router.post("/:id/marriages", verifyToken, async (req, res) => {
       ...req.body,
     });
 
+    // AUTO-SYNC GENERATION: Both spouses should have same generation
+    // This ensures they can have children in the next generation
+    if (suami_id && istri_id) {
+      try {
+        const suami = await Person.findById(suami_id);
+        const istri = await Person.findById(istri_id);
+
+        if (suami && istri) {
+          const suamiGen = suami.generation || 1;
+          const istriGen = istri.generation || 1;
+
+          // If generations differ, set both to the max generation
+          if (suamiGen !== istriGen) {
+            const targetGen = Math.max(suamiGen, istriGen);
+            console.log(
+              `🔗 Auto-syncing generation for marriage: suami gen ${suamiGen} → ${targetGen}, istri gen ${istriGen} → ${targetGen}`
+            );
+
+            // Update both to same generation
+            if (suamiGen !== targetGen) {
+              await Person.update(suami_id, { generation: targetGen });
+            }
+            if (istriGen !== targetGen) {
+              await Person.update(istri_id, { generation: targetGen });
+            }
+          }
+        }
+      } catch (syncErr) {
+        console.warn(
+          "⚠️ Error syncing generation for marriage:",
+          syncErr.message
+        );
+        // Don't fail the marriage creation - just log warning
+      }
+    }
+
     res.status(HTTP_STATUS.CREATED).json({
       success: true,
       message: "Marriage created successfully",
