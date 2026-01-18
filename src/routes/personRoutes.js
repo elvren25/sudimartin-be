@@ -434,22 +434,32 @@ router.post("/:id/marriages", verifyToken, async (req, res) => {
           const suamiHasParents = suami.ayah_id || suami.ibu_id;
           const istriHasParents = istri.ayah_id || istri.ibu_id;
 
+          console.log(
+            `👨‍👩‍👧 Parent sync check: suami(${suami_id}) hasParents=${suamiHasParents}(ayah=${suami.ayah_id}, ibu=${suami.ibu_id}), istri(${istri_id}) hasParents=${istriHasParents}(ayah=${istri.ayah_id}, ibu=${istri.ibu_id})`
+          );
+
           if (suamiHasParents && !istriHasParents) {
             console.log(
-              `👨‍👩‍👧 Syncing parents: istri (ID ${istri_id}) now has same parents as suami`
+              `👨‍👩‍👧 Syncing parents: istri (ID ${istri_id}) now has same parents as suami (ayah_id=${suami.ayah_id}, ibu_id=${suami.ibu_id})`
             );
             await Person.update(istri_id, {
               ayah_id: suami.ayah_id || null,
               ibu_id: suami.ibu_id || null,
             });
+            console.log(`✅ Istri parent sync complete`);
           } else if (istriHasParents && !suamiHasParents) {
             console.log(
-              `👨‍👩‍👧 Syncing parents: suami (ID ${suami_id}) now has same parents as istri`
+              `👨‍👩‍👧 Syncing parents: suami (ID ${suami_id}) now has same parents as istri (ayah_id=${istri.ayah_id}, ibu_id=${istri.ibu_id})`
             );
             await Person.update(suami_id, {
               ayah_id: istri.ayah_id || null,
               ibu_id: istri.ibu_id || null,
             });
+            console.log(`✅ Suami parent sync complete`);
+          } else if (suamiHasParents && istriHasParents) {
+            console.log(`ℹ️ Both already have parents - no sync needed`);
+          } else {
+            console.log(`ℹ️ Neither has parents - both are roots`);
           }
         }
       } catch (syncErr) {
